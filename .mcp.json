@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "linear-admin-local": {
+      "command": "python3",
+      "args": [
+        "scripts/linear_admin_mcp.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "LINEAR_ADMIN_PLUGIN_CONFIG_FILE": "config/provider_refs.json"
+      }
+    }
+  }
+}

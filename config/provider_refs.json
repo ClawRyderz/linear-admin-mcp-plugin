@@ -1,0 +1,13 @@
+{
+  "credential_sources": {
+    "client_id_ref_candidates": [],
+    "client_secret_ref_candidates": [],
+    "client_id_env_vars": [
+      "LINEAR_CLIENT_ID"
+    ],
+    "client_secret_env_vars": [
+      "LINEAR_CLIENT_SECRET"
+    ]
+  },
+  "scope": "read,write"
+}

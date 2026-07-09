@@ -1,0 +1,43 @@
+{
+  "name": "linear-admin",
+  "version": "1.0.0",
+  "description": "Codex plugin for admin-grade Linear automation through a local GraphQL path.",
+  "author": {
+    "name": "ClawRyderz",
+    "url": "https://github.com/ClawRyderz/codex-linear-admin-plugin"
+  },
+  "homepage": "https://github.com/ClawRyderz/codex-linear-admin-plugin",
+  "repository": "https://github.com/ClawRyderz/codex-linear-admin-plugin",
+  "license": "MIT",
+  "keywords": [
+    "linear",
+    "graphql",
+    "mcp",
+    "project-setup",
+    "automation"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Linear Admin",
+    "shortDescription": "Admin-grade Linear setup through a local GraphQL path",
+    "longDescription": "Use a local-only MCP server to mint Linear OAuth app tokens from 1Password-backed refs, inspect the GraphQL schema, and automate shared views, templates, and project updates without browser automation.",
+    "developerName": "ClawRyderz",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://linear.app/developers/graphql",
+    "privacyPolicyURL": "https://linear.app/privacy",
+    "termsOfServiceURL": "https://linear.app/terms",
+    "defaultPrompt": [
+      "Create shared Linear views for a project",
+      "Post a project update through the app-token GraphQL path",
+      "Inspect the Linear GraphQL schema for a feature"
+    ],
+    "brandColor": "#5E6AD2",
+    "screenshots": []
+  }
+}

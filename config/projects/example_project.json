@@ -1,0 +1,82 @@
+{
+  "project_name": "Example Project",
+  "project_id": "YOUR_PROJECT_ID",
+  "team_id": "YOUR_TEAM_ID",
+  "custom_views": [
+    {
+      "id": "YOUR_READY_VIEW_ID",
+      "name": "Ready for Work",
+      "description": "Unblocked project issues that are ready to start.",
+      "shared": true,
+      "filterData": {
+        "and": [
+          {
+            "project": {
+              "id": {
+                "eq": "YOUR_PROJECT_ID"
+              }
+            }
+          },
+          {
+            "state": {
+              "name": {
+                "in": [
+                  "Todo"
+                ]
+              }
+            }
+          },
+          {
+            "hasBlockedByRelations": {
+              "eq": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "YOUR_IN_PROGRESS_VIEW_ID",
+      "name": "In Progress",
+      "description": "Project issues that are actively being worked on.",
+      "shared": true,
+      "filterData": {
+        "and": [
+          {
+            "project": {
+              "id": {
+                "eq": "YOUR_PROJECT_ID"
+              }
+            }
+          },
+          {
+            "state": {
+              "name": {
+                "in": [
+                  "In Progress"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "templates": [
+    {
+      "name": "Implementation Task",
+      "type": "issue",
+      "description": "A reusable issue template for implementation work.",
+      "templateData": {
+        "description": "Describe the outcome.\n\n## Acceptance criteria\n\n- [ ] ...\n- [ ] ...\n\n## Verification\n\n- [ ] ...\n\n## Scope\n\n**In scope:** ...\n\n**Out of scope:** ..."
+      }
+    },
+    {
+      "name": "Research Task",
+      "type": "issue",
+      "description": "A reusable issue template for bounded research.",
+      "templateData": {
+        "description": "State the question to answer.\n\n## Evidence\n\n- ...\n\n## Decision or recommendation\n\n- ...\n\n## Follow-up\n\n- [ ] ..."
+      }
+    }
+  ]
+}
