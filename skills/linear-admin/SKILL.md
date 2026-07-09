@@ -1,13 +1,13 @@
 ---
 name: linear-admin
-description: Use the local Linear Admin plugin when the user wants admin-grade Linear automation beyond the default connector, such as GraphQL schema inspection, shared custom views, workspace templates, project updates, or project setup sync from config.
+description: Use the local Linear Admin MCP server for GraphQL schema inspection, shared custom views, workspace templates, project updates, or project setup sync from config.
 ---
 
 # Linear Admin
 
 ## Overview
 
-This plugin exposes a local-only Linear GraphQL admin path for Codex.
+This bundle exposes a local-only Linear GraphQL admin path through MCP.
 
 - It mints Linear app tokens from environment variables or user-configured 1Password references.
 - It can inspect the live GraphQL schema.
@@ -16,7 +16,7 @@ This plugin exposes a local-only Linear GraphQL admin path for Codex.
 
 ## When to use it
 
-Use this plugin first when the user wants:
+Use these Linear Admin MCP tools when the user wants:
 
 - shared custom views created or updated in Linear
 - workspace or team template automation
@@ -28,8 +28,8 @@ Use this plugin first when the user wants:
 
 - Never paste the Linear client secret, client id, bearer token, or 1Password service-account token into chat.
 - Keep only the static OAuth app credentials in 1Password.
-- Mint short-lived access tokens at runtime.
-- Update `config/provider_refs.json` or a copied local equivalent rather than hardcoding credentials in plugin files.
+- Mint app access tokens at runtime and never persist them.
+- Update `config/provider_refs.json` or a copied local equivalent rather than hardcoding credentials in repository files.
 
 ## Project presets
 
@@ -46,8 +46,8 @@ Use this plugin first when the user wants:
 - Use `linear_project_setup_plan` to preview project setup mutations from a config file.
 - Use `linear_project_setup_apply` to apply the planned views and templates from a config file.
 
-## Install note
+## Installation note
 
-- The committed `.mcp.json` is a portable source-tree default.
-- For normal local use, run `python3 scripts/install_local_plugin.py --destination ~/.agents/plugins/plugins/linear-admin`.
-- The installer copies the plugin and rewrites `.mcp.json` there with absolute local paths for Codex.
+- The committed `.mcp.json` is a portable source-tree default for clients that load project MCP config.
+- For an isolated local install, run `python3 scripts/install.py --destination ~/.local/share/linear-admin-mcp`.
+- Codex and Claude Code manifests are included as optional harness adapters.

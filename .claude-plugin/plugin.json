@@ -1,0 +1,22 @@
+{
+  "name": "linear-admin",
+  "version": "1.1.0",
+  "description": "Inspect and administer Linear through a local MCP server with explicit plan/apply workflows.",
+  "author": {
+    "name": "ClawRyderz"
+  },
+  "homepage": "https://github.com/ClawRyderz/linear-admin-mcp",
+  "repository": "https://github.com/ClawRyderz/linear-admin-mcp",
+  "license": "MIT",
+  "mcpServers": {
+    "linear-admin-local": {
+      "command": "python3",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/scripts/linear_admin_mcp.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}
