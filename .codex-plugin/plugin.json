@@ -1,13 +1,13 @@
 {
   "name": "linear-admin",
-  "version": "1.0.0",
-  "description": "Codex plugin for admin-grade Linear automation through a local GraphQL path.",
+  "version": "1.1.0",
+  "description": "Inspect and administer Linear through a local MCP server with explicit plan/apply workflows.",
   "author": {
     "name": "ClawRyderz",
-    "url": "https://github.com/ClawRyderz/codex-linear-admin-plugin"
+    "url": "https://github.com/ClawRyderz/linear-admin-mcp-plugin"
   },
-  "homepage": "https://github.com/ClawRyderz/codex-linear-admin-plugin",
-  "repository": "https://github.com/ClawRyderz/codex-linear-admin-plugin",
+  "homepage": "https://github.com/ClawRyderz/linear-admin-mcp-plugin",
+  "repository": "https://github.com/ClawRyderz/linear-admin-mcp-plugin",
   "license": "MIT",
   "keywords": [
     "linear",
@@ -19,9 +19,9 @@
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "Linear Admin",
+    "displayName": "Linear Admin MCP Plugin",
     "shortDescription": "Admin-grade Linear setup through a local GraphQL path",
-    "longDescription": "Use a local-only MCP server to mint Linear OAuth app tokens from 1Password-backed refs, inspect the GraphQL schema, and automate shared views, templates, and project updates without browser automation.",
+    "longDescription": "Inspect Linear's GraphQL schema and manage shared views, templates, and project setup through a portable local MCP server with explicit plan/apply workflows.",
     "developerName": "ClawRyderz",
     "category": "Productivity",
     "capabilities": [

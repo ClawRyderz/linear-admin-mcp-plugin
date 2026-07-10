@@ -13,7 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_SETUP_PATH = REPO_ROOT / "scripts" / "linear_project_setup.py"
 MCP_SERVER_PATH = REPO_ROOT / "scripts" / "linear_admin_mcp.py"
 RENDER_MCP_PATH = REPO_ROOT / "scripts" / "render_mcp_config.py"
-INSTALL_PLUGIN_PATH = REPO_ROOT / "scripts" / "install_local_plugin.py"
+INSTALL_PATH = REPO_ROOT / "scripts" / "install.py"
 EXAMPLE_PROJECT_PATH = REPO_ROOT / "config" / "projects" / "example_project.json"
 
 PROJECT_SPEC = spec_from_file_location("linear_admin_project_setup", PROJECT_SETUP_PATH)
@@ -30,9 +30,9 @@ RENDER_MODULE = module_from_spec(RENDER_SPEC)
 sys.modules[RENDER_SPEC.name] = RENDER_MODULE
 RENDER_SPEC.loader.exec_module(RENDER_MODULE)
 
-INSTALL_SPEC = spec_from_file_location("linear_admin_install_local_plugin", INSTALL_PLUGIN_PATH)
+INSTALL_SPEC = spec_from_file_location("linear_admin_install", INSTALL_PATH)
 if INSTALL_SPEC is None or INSTALL_SPEC.loader is None:
-    raise RuntimeError("Unable to load install_local_plugin.py")
+    raise RuntimeError("Unable to load install.py")
 INSTALL_MODULE = module_from_spec(INSTALL_SPEC)
 sys.modules[INSTALL_SPEC.name] = INSTALL_MODULE
 INSTALL_SPEC.loader.exec_module(INSTALL_MODULE)
@@ -140,15 +140,15 @@ def test_plan_project_setup_updates_existing_view_even_if_name_drifted() -> None
 
 
 def test_render_mcp_config_writes_absolute_paths(tmp_path: Path) -> None:
-    plugin_root = tmp_path / "linear-admin"
-    (plugin_root / "scripts").mkdir(parents=True)
-    (plugin_root / "config").mkdir(parents=True)
+    bundle_root = tmp_path / "linear-admin"
+    (bundle_root / "scripts").mkdir(parents=True)
+    (bundle_root / "config").mkdir(parents=True)
     output_path = tmp_path / ".mcp.json"
 
     exit_code = RENDER_MODULE.main(
         [
-            "--plugin-root",
-            str(plugin_root),
+            "--bundle-root",
+            str(bundle_root),
             "--output",
             str(output_path),
         ]
@@ -158,18 +158,18 @@ def test_render_mcp_config_writes_absolute_paths(tmp_path: Path) -> None:
     server = payload["mcpServers"]["linear-admin-local"]
 
     assert exit_code == 0
-    assert server["args"] == [str(plugin_root / "scripts" / "linear_admin_mcp.py")]
-    assert server["env"]["LINEAR_ADMIN_PLUGIN_CONFIG_FILE"] == str(
-        plugin_root / "config" / "provider_refs.json"
+    assert server["args"] == [str(bundle_root / "scripts" / "linear_admin_mcp.py")]
+    assert server["env"]["LINEAR_ADMIN_CONFIG_FILE"] == str(
+        bundle_root / "config" / "provider_refs.json"
     )
 
 
-def test_install_local_plugin_copies_bundle_and_renders_absolute_mcp(tmp_path: Path) -> None:
+def test_install_copies_bundle_and_renders_absolute_mcp(tmp_path: Path) -> None:
     destination = tmp_path / "linear-admin-installed"
 
     exit_code = INSTALL_MODULE.main(
         [
-            "--plugin-root",
+            "--bundle-root",
             str(REPO_ROOT),
             "--destination",
             str(destination),
@@ -186,7 +186,7 @@ def test_install_local_plugin_copies_bundle_and_renders_absolute_mcp(tmp_path: P
     assert server["args"] == [str(destination / "scripts" / "linear_admin_mcp.py")]
 
 
-def test_install_local_plugin_replaces_symlink_destination(tmp_path: Path) -> None:
+def test_install_replaces_symlink_destination(tmp_path: Path) -> None:
     real_target = tmp_path / "real-target"
     real_target.mkdir()
     destination = tmp_path / "linear-admin-link"
@@ -194,7 +194,7 @@ def test_install_local_plugin_replaces_symlink_destination(tmp_path: Path) -> No
 
     exit_code = INSTALL_MODULE.main(
         [
-            "--plugin-root",
+            "--bundle-root",
             str(REPO_ROOT),
             "--destination",
             str(destination),

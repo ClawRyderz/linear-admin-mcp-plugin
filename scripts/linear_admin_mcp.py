@@ -29,15 +29,26 @@ from linear_project_setup import (  # noqa: E402
     serialize_planned_mutation,
     summarize_plan,
 )
+from mcp_stdio import read_message, write_message  # noqa: E402
 
 
 SERVER_NAME = "linear-admin-local"
-SERVER_VERSION = "1.0.0"
-DEFAULT_PROTOCOL_VERSION = "2024-11-05"
+SERVER_VERSION = "1.1.0"
+LATEST_PROTOCOL_VERSION = "2025-06-18"
+SUPPORTED_PROTOCOL_VERSIONS = frozenset(
+    {"2024-11-05", "2025-03-26", LATEST_PROTOCOL_VERSION}
+)
 TOOL_SCHEMAS: tuple[dict[str, Any], ...] = (
     {
         "name": "linear_schema_find",
+        "title": "Find Linear schema capabilities",
         "description": "Search the live Linear GraphQL schema for matching types and root fields.",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -54,7 +65,14 @@ TOOL_SCHEMAS: tuple[dict[str, Any], ...] = (
     },
     {
         "name": "linear_schema_type",
+        "title": "Inspect a Linear schema type",
         "description": "Inspect one named type from the live Linear GraphQL schema.",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -67,7 +85,14 @@ TOOL_SCHEMAS: tuple[dict[str, Any], ...] = (
     },
     {
         "name": "linear_graphql_query",
+        "title": "Run a Linear GraphQL operation",
         "description": "Run a raw GraphQL query with the local Linear app token path.",
+        "annotations": {
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -81,7 +106,14 @@ TOOL_SCHEMAS: tuple[dict[str, Any], ...] = (
     },
     {
         "name": "linear_project_setup_plan",
+        "title": "Plan Linear project setup",
         "description": "Preview shared-view and template mutations for a project config.",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -94,7 +126,14 @@ TOOL_SCHEMAS: tuple[dict[str, Any], ...] = (
     },
     {
         "name": "linear_project_setup_apply",
+        "title": "Apply Linear project setup",
         "description": "Apply shared-view and template mutations for a project config.",
+        "annotations": {
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -108,33 +147,6 @@ TOOL_SCHEMAS: tuple[dict[str, Any], ...] = (
 )
 
 
-def read_message() -> dict[str, Any] | None:
-    headers: dict[str, str] = {}
-    while True:
-        line = sys.stdin.buffer.readline()
-        if not line:
-            return None
-        if line in (b"\n", b"\r\n"):
-            break
-        decoded = line.decode("utf-8").strip()
-        if ":" not in decoded:
-            continue
-        key, value = decoded.split(":", 1)
-        headers[key.strip().lower()] = value.strip()
-    content_length = headers.get("content-length")
-    if content_length is None:
-        raise ValueError("Missing Content-Length header.")
-    payload = sys.stdin.buffer.read(int(content_length))
-    return json.loads(payload.decode("utf-8"))
-
-
-def write_message(payload: dict[str, Any]) -> None:
-    encoded = json.dumps(payload, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
-    sys.stdout.buffer.write(f"Content-Length: {len(encoded)}\r\n\r\n".encode("ascii"))
-    sys.stdout.buffer.write(encoded)
-    sys.stdout.buffer.flush()
-
-
 def write_result(request_id: Any, result: dict[str, Any]) -> None:
     write_message({"jsonrpc": "2.0", "id": request_id, "result": result})
 
@@ -144,7 +156,11 @@ def write_error(request_id: Any, code: int, message: str) -> None:
 
 
 def tool_text(payload: dict[str, Any]) -> dict[str, Any]:
-    return {"content": [{"type": "text", "text": json.dumps(payload, indent=2, sort_keys=True)}]}
+    return {
+        "content": [{"type": "text", "text": json.dumps(payload, indent=2, sort_keys=True)}],
+        "structuredContent": payload,
+        "isError": False,
+    }
 
 
 def resolve_provider_config(arguments: dict[str, Any]) -> Path:
@@ -237,17 +253,31 @@ def handle_request(message: dict[str, Any]) -> None:
     request_id = message.get("id")
 
     if method == "initialize":
+        params = message.get("params")
+        if not isinstance(params, dict):
+            params = {}
+        requested_version = str(params.get("protocolVersion") or "")
+        protocol_version = (
+            requested_version
+            if requested_version in SUPPORTED_PROTOCOL_VERSIONS
+            else LATEST_PROTOCOL_VERSION
+        )
         write_result(
             request_id,
             {
-                "protocolVersion": DEFAULT_PROTOCOL_VERSION,
+                "protocolVersion": protocol_version,
                 "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
-                "capabilities": {"tools": {}},
+                "capabilities": {"tools": {"listChanged": False}},
+                "instructions": "Inspect Linear safely, plan project setup before applying it, and treat raw GraphQL operations as potentially mutating.",
             },
         )
         return
 
-    if method == "notifications/initialized":
+    if method in {"notifications/initialized", "notifications/cancelled"}:
+        return
+
+    if method == "ping":
+        write_result(request_id, {})
         return
 
     if method == "tools/list":
@@ -264,7 +294,14 @@ def handle_request(message: dict[str, Any]) -> None:
             raise ValueError("tools/call requires a tool name.")
         if not isinstance(arguments, dict):
             raise ValueError("tools/call arguments must be an object.")
-        write_result(request_id, handle_tool_call(tool_name, arguments))
+        try:
+            result = handle_tool_call(tool_name, arguments)
+        except Exception as exc:  # noqa: BLE001
+            result = {
+                "content": [{"type": "text", "text": str(exc)}],
+                "isError": True,
+            }
+        write_result(request_id, result)
         return
 
     if request_id is not None:

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Portable Linear GraphQL runtime for the local Linear Admin plugin."""
+"""Portable Linear GraphQL runtime for the local Linear Admin MCP server."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ from urllib.request import Request, urlopen
 
 LINEAR_OAUTH_TOKEN_URL = "https://api.linear.app/oauth/token"
 LINEAR_GRAPHQL_URL = "https://api.linear.app/graphql"
-CONFIG_ENV_VAR = "LINEAR_ADMIN_PLUGIN_CONFIG_FILE"
+CONFIG_ENV_VARS = ("LINEAR_ADMIN_CONFIG_FILE", "LINEAR_ADMIN_PLUGIN_CONFIG_FILE")
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[1] / "config" / "provider_refs.json"
 DEFAULT_SCOPE = "read,write"
 OP_AUTH_ENV_KEYS = frozenset(
@@ -142,7 +142,7 @@ class LinearAccessToken:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Portable Linear GraphQL runtime for local-only plugin use."
+        description="Portable Linear GraphQL runtime for local MCP use."
     )
     parser.add_argument(
         "--config-file",
@@ -257,7 +257,11 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def default_config_path() -> Path:
-    return Path(os.environ.get(CONFIG_ENV_VAR, str(DEFAULT_CONFIG_PATH))).expanduser()
+    configured_path = next(
+        (os.environ[name] for name in CONFIG_ENV_VARS if os.environ.get(name, "").strip()),
+        str(DEFAULT_CONFIG_PATH),
+    )
+    return Path(configured_path).expanduser()
 
 
 def load_plugin_config(config_file: Path | None = None) -> dict[str, Any]:
@@ -424,7 +428,7 @@ def issue_linear_client_credentials_token(
         headers={
             "Authorization": f"Basic {basic_auth}",
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-            "User-Agent": "linear-admin-plugin/1.0",
+            "User-Agent": "linear-admin-mcp/1.1",
         },
         method="POST",
     )
@@ -464,7 +468,7 @@ def graphql_request(
         headers={
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
-            "User-Agent": "linear-admin-plugin/1.0",
+            "User-Agent": "linear-admin-mcp/1.1",
         },
         method="POST",
     )
