@@ -1,4 +1,4 @@
-# Linear Admin MCP
+# Linear Admin MCP Plugin
 
 A portable MCP server for advanced Linear administration through the GraphQL API.
 
@@ -40,17 +40,17 @@ Linear documents the [client credentials flow](https://linear.app/developers/oau
 Clone the repository and create an isolated local bundle:
 
 ```bash
-git clone https://github.com/ClawRyderz/linear-admin-mcp.git
-cd linear-admin-mcp
+git clone https://github.com/ClawRyderz/linear-admin-mcp-plugin.git
+cd linear-admin-mcp-plugin
 python3 scripts/install.py \
-  --destination ~/.local/share/linear-admin-mcp
+  --destination ~/.local/share/linear-admin-mcp-plugin
 ```
 
 The installer copies the bundle, excludes repository history and caches, and renders an absolute-path `.mcp.json`. Re-run it with `--force` to replace an existing installation.
 
 ## Configure authentication
 
-No credentials or private 1Password references are included. Configure the installed copy at `~/.local/share/linear-admin-mcp/config/provider_refs.json`, use an external config through `LINEAR_ADMIN_CONFIG_FILE`, or provide credentials through environment variables.
+No credentials or private 1Password references are included. Configure the installed copy at `~/.local/share/linear-admin-mcp-plugin/config/provider_refs.json`, use an external config through `LINEAR_ADMIN_CONFIG_FILE`, or provide credentials through environment variables.
 
 ### Environment variables
 
@@ -88,9 +88,9 @@ Authenticate the 1Password CLI normally, or use `OP_SERVICE_ACCOUNT_TOKEN`. For 
 The committed project file contains placeholders only. Keep real workspace, project, view, and template details in an untracked file outside the installed bundle.
 
 ```bash
-mkdir -p ~/.config/linear-admin-mcp/projects
-cp ~/.local/share/linear-admin-mcp/config/projects/example_project.json \
-  ~/.config/linear-admin-mcp/projects/my-project.json
+mkdir -p ~/.config/linear-admin-mcp-plugin/projects
+cp ~/.local/share/linear-admin-mcp-plugin/config/projects/example_project.json \
+  ~/.config/linear-admin-mcp-plugin/projects/my-project.json
 ```
 
 Before using it:
@@ -109,15 +109,15 @@ Project setup tools require an explicit `project_config_file`; there is no defau
 Load the native plugin for one session:
 
 ```bash
-claude --plugin-dir ~/.local/share/linear-admin-mcp
+claude --plugin-dir ~/.local/share/linear-admin-mcp-plugin
 ```
 
 This loads the bundled skill and MCP server. For a persistent user-level MCP registration without the skill:
 
 ```bash
 claude mcp add linear-admin --scope user \
-  -e LINEAR_ADMIN_CONFIG_FILE=$HOME/.local/share/linear-admin-mcp/config/provider_refs.json \
-  -- python3 $HOME/.local/share/linear-admin-mcp/scripts/linear_admin_mcp.py
+  -e LINEAR_ADMIN_CONFIG_FILE=$HOME/.local/share/linear-admin-mcp-plugin/config/provider_refs.json \
+  -- python3 $HOME/.local/share/linear-admin-mcp-plugin/scripts/linear_admin_mcp.py
 ```
 
 See [Claude Code's MCP documentation](https://code.claude.com/docs/en/mcp) for scopes and project `.mcp.json` approval behavior.
@@ -128,8 +128,8 @@ Register the stdio server directly:
 
 ```bash
 codex mcp add linear-admin \
-  --env LINEAR_ADMIN_CONFIG_FILE=$HOME/.local/share/linear-admin-mcp/config/provider_refs.json \
-  -- python3 $HOME/.local/share/linear-admin-mcp/scripts/linear_admin_mcp.py
+  --env LINEAR_ADMIN_CONFIG_FILE=$HOME/.local/share/linear-admin-mcp-plugin/config/provider_refs.json \
+  -- python3 $HOME/.local/share/linear-admin-mcp-plugin/scripts/linear_admin_mcp.py
 ```
 
 The bundle also includes `.codex-plugin/plugin.json` and the `linear-admin` skill for Codex marketplace packaging. See the official [Codex plugin guide](https://learn.chatgpt.com/docs/plugins).
@@ -144,10 +144,10 @@ Use the absolute-path `.mcp.json` produced by the installer, or adapt this entry
     "linear-admin": {
       "command": "python3",
       "args": [
-        "/ABSOLUTE/PATH/linear-admin-mcp/scripts/linear_admin_mcp.py"
+        "/ABSOLUTE/PATH/linear-admin-mcp-plugin/scripts/linear_admin_mcp.py"
       ],
       "env": {
-        "LINEAR_ADMIN_CONFIG_FILE": "/ABSOLUTE/PATH/linear-admin-mcp/config/provider_refs.json"
+        "LINEAR_ADMIN_CONFIG_FILE": "/ABSOLUTE/PATH/linear-admin-mcp-plugin/config/provider_refs.json"
       }
     }
   }
@@ -170,9 +170,9 @@ For project setup:
 The command-line helper follows the same pattern. Omitting `--apply` is plan-only:
 
 ```bash
-python3 ~/.local/share/linear-admin-mcp/scripts/linear_project_setup.py \
-  --project-config ~/.config/linear-admin-mcp/projects/my-project.json \
-  --provider-config ~/.local/share/linear-admin-mcp/config/provider_refs.json
+python3 ~/.local/share/linear-admin-mcp-plugin/scripts/linear_project_setup.py \
+  --project-config ~/.config/linear-admin-mcp-plugin/projects/my-project.json \
+  --provider-config ~/.local/share/linear-admin-mcp-plugin/config/provider_refs.json
 ```
 
 Add `--apply` only after reviewing the plan.

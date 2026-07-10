@@ -4,10 +4,10 @@
   "description": "Inspect and administer Linear through a local MCP server with explicit plan/apply workflows.",
   "author": {
     "name": "ClawRyderz",
-    "url": "https://github.com/ClawRyderz/linear-admin-mcp"
+    "url": "https://github.com/ClawRyderz/linear-admin-mcp-plugin"
   },
-  "homepage": "https://github.com/ClawRyderz/linear-admin-mcp",
-  "repository": "https://github.com/ClawRyderz/linear-admin-mcp",
+  "homepage": "https://github.com/ClawRyderz/linear-admin-mcp-plugin",
+  "repository": "https://github.com/ClawRyderz/linear-admin-mcp-plugin",
   "license": "MIT",
   "keywords": [
     "linear",
@@ -19,7 +19,7 @@
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "Linear Admin MCP",
+    "displayName": "Linear Admin MCP Plugin",
     "shortDescription": "Admin-grade Linear setup through a local GraphQL path",
     "longDescription": "Inspect Linear's GraphQL schema and manage shared views, templates, and project setup through a portable local MCP server with explicit plan/apply workflows.",
     "developerName": "ClawRyderz",

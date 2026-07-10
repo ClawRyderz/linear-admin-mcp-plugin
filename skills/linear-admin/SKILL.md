@@ -49,5 +49,5 @@ Use these Linear Admin MCP tools when the user wants:
 ## Installation note
 
 - The committed `.mcp.json` is a portable source-tree default for clients that load project MCP config.
-- For an isolated local install, run `python3 scripts/install.py --destination ~/.local/share/linear-admin-mcp`.
+- For an isolated local install, run `python3 scripts/install.py --destination ~/.local/share/linear-admin-mcp-plugin`.
 - Codex and Claude Code manifests are included as optional harness adapters.
